@@ -1,4 +1,3 @@
-/*
 import Header from "./components/Header";
 import Inicio from "./components/Inicio";
 import CatalogoCaballero from "./components/CatalogoCaballero";
@@ -18,15 +17,5 @@ export default function Home() {
         <Contacto />
       </main>
     </>
-  );
-}
-*/
-
-export default function Home() {
-  return (
-    <main style={{ padding: 40 }}>
-      <h1>GA Stilus 🚀</h1>
-      <p>Tu sitio ya está en producción.</p>
-    </main>
   );
 }
