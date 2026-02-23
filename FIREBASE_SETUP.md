@@ -1,4 +1,6 @@
-# Configuración de Firebase para el panel admin
+# Configuración de Firebase para el proyecto `ga-stilus-prd`
+
+Este documento describe los pasos básicos para configurar Firestore y Storage en el nuevo proyecto. Adapta los valores de acuerdo con `ga-stilus-prod`.
 
 Este proyecto utiliza Firestore y Storage para almacenar productos de caballero y categorías.
 Para evitar el error `Missing or insufficient permissions` debes configurar reglas y asignar un rol de administrador.
@@ -53,14 +55,14 @@ service firebase.storage {
 ## 3. Asignar claim `admin`
 
 Para que la aplicación sepa quién es administrador hay que anotar el usuario con un `custom claim`.
-Hay un script incluido en el repositorio: `scripts/set-admin.js`. Ejemplo de uso:
 
-```bash
-# primero descarga la clave de servicio en serviceAccountKey.json en la raíz
-node scripts/set-admin.js <UID_DEL_USUARIO>
+> *Nota:* El script `scripts/set-admin.js` se eliminó en la limpieza. Si aún necesitas asignar el claim admin, vuelve a crear un pequeño script o usa la [API de Admin SDK](https://firebase.google.com/docs/auth/admin/custom-claims) directamente.
+
+Un ejemplo de cómo hacerlo con Node:
+```js
+const admin = require('firebase-admin');
+admin.auth().setCustomUserClaims(uid, { admin: true });
 ```
-
-Esto marca al usuario como admin; al entrar en la app su token contendrá `claims.admin === true`.
 
 
 ## 4. Despliegue de reglas

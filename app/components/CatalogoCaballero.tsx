@@ -1,45 +1,64 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-// Firebase removed: categories will be hardcoded for demo
+import { collection, getDocs } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
+import { db } from '@/lib/firebase';
 
-interface Category {
+interface Categoria {
   id: string;
   nombre: string;
-  [key: string]: any;
 }
 
-const CATEGORY_ORDER = ['sudadera', 'playera', 'chamarra', 'accesorio'];
-
 export default function CatalogoCaballero() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
-
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [selectedCategoria, setSelectedCategoria] = useState<Categoria | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    // hardcoded categories for offline/demo mode
-    setCategories([
-      { id: 'sudadera', nombre: 'Sudaderas', imageName: 'sudaderaCaballero' },
-      { id: 'playera', nombre: 'Playeras', imageName: 'playeraCaballero' },
-      { id: 'chamarra', nombre: 'Chamarras', imageName: 'chamarraCaballero' },
-    ]);
+    fetchCategorias();
   }, []);
+
+  const fetchCategorias = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, 'categorias'));
+
+      const cats: Categoria[] = snapshot.docs
+        .filter((d) => {
+          const data = d.data() as any;
+          return (
+            data.activa !== false &&
+            Array.isArray(data.genero) &&
+            data.genero.includes('caballero')
+          );
+        })
+        .map((d) => ({
+          id: d.id,
+          nombre: d.data().nombre || '',
+          
+        }));
+
+      setCategorias(cats);
+    } catch (err) {
+      console.error('Error al cargar categorías', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const scroll = (direction: 'left' | 'right') => {
     const carousel = carouselRef.current;
-    if (carousel) {
-      const scrollAmount = 350;
-      carousel.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-    }
+    if (!carousel) return;
+
+    carousel.scrollBy({
+      left: direction === 'left' ? -350 : 350,
+      behavior: 'smooth',
+    });
   };
 
   const checkScroll = () => {
@@ -47,9 +66,12 @@ export default function CatalogoCaballero() {
     if (!carousel) return;
 
     const { scrollLeft, scrollWidth, clientWidth } = carousel;
-
     setCanScrollLeft(scrollLeft > 0);
     setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
+  };
+
+  const handleCategoryClick = (categoria: Categoria) => {
+  setSelectedCategoria(categoria);
   };
 
   useEffect(() => {
@@ -57,7 +79,6 @@ export default function CatalogoCaballero() {
     if (!carousel) return;
 
     checkScroll();
-
     carousel.addEventListener('scroll', checkScroll);
     window.addEventListener('resize', checkScroll);
 
@@ -65,79 +86,70 @@ export default function CatalogoCaballero() {
       carousel.removeEventListener('scroll', checkScroll);
       window.removeEventListener('resize', checkScroll);
     };
-  }, [categories]);
+  }, [categorias]);
+
+  if (loading) {
+    return <section className="catalog-section"><p>Cargando...</p></section>;
+  }
+
+  if (selectedCategoria) {
+    return <></>; // página completamente en blanco
+  }
 
   return (
     <section id="caballero" className="catalog-section">
       <div className="catalog-content">
         <h2 className="catalog-title">Catálogo de Caballero</h2>
 
-        {loading && (
-          <div className="catalog-loading">
-            <p>Cargando categorías...</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="catalog-error">
-            <p>{error}</p>
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div className="carousel-container">
-            {canScrollLeft && (
+        <div className="carousel-container">
+          {canScrollLeft && (
             <button
               className="carousel-arrow carousel-arrow-left"
               onClick={() => scroll('left')}
-              aria-label="Anterior"
             >
               ‹
             </button>
-            )}
-            <div className="catalog-carousel" ref={carouselRef}>
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  className="catalog-card"
-                  style={{
-                    opacity:
-                      hoveredCard === null || hoveredCard === category.id ? 1 : 0.3,
-                  }}
-                  onMouseEnter={() => setHoveredCard(category.id)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                >
-                  <div className="catalog-card-image">
-                    <Image
-                      src={`/images/${category.imageName}.jpg`}
-                      alt={category.nombre}
-                      fill
-                      style={{
-                        objectFit: 'cover',
-                        objectPosition: 'center',
-                      }}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="catalog-card-content">
-                    <h3 className="catalog-card-title">{category.nombre}</h3>
-                  </div>
+          )}
+
+          <div className="catalog-carousel" ref={carouselRef}>
+            {categorias.map((category) => (
+              <div
+                key={category.id}
+                className="catalog-card"
+                style={{
+                  opacity:
+                    hoveredCard === null || hoveredCard === category.id ? 1 : 0.3,
+                }}
+                onMouseEnter={() => setHoveredCard(category.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => router.push('/CatalogoCaballero')}
+              >
+                <div className="catalog-card-image">
+                  <div
+                    className="placeholder-img"
+                    style={{ width: '100%', height: '100%' }}
+                  />
                 </div>
-              ))}
-            </div>
-            {canScrollRight && (
+                <div className="catalog-card-content">
+                  <h3 className="catalog-card-title">
+                    {category.nombre}
+                  </h3>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {canScrollRight && (
             <button
               className="carousel-arrow carousel-arrow-right"
               onClick={() => scroll('right')}
-              aria-label="Siguiente"
             >
               ›
             </button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
-        {!loading && !error && categories.length === 0 && (
+        {categorias.length === 0 && (
           <div className="catalog-empty">
             <p>No hay categorías disponibles</p>
           </div>
