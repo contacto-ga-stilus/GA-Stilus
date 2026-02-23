@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import { useAuth } from '../components/Auth';
 import './admin.css';
+import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
   const { isAuthenticated, isLoading, login, logout } = useAuth();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -97,13 +100,15 @@ export default function AdminPage() {
           <div className="dashboard-card">
             <h3>💼 Gestionar Catálogo de Caballero</h3>
             <p>Administra los productos y categorías de caballeros</p>
-            <button className="btn-action">Ir al catálogo</button>
+            <button className="btn-action"
+            onClick={() => router.push('/admin/caballero')}>Ir al catálogo</button>
           </div>
 
           <div className="dashboard-card">
             <h3>📦 Gestionar Catálogo de Dama</h3>
             <p>Administra los productos y categorías de damas</p>
-            <button className="btn-action">Ir al catálogo</button>
+            <button className="btn-action"
+            /*onClick={() => router.push('/admin/dama')}*/>Ir al catálogo</button>
           </div>
         </div>
       </main>
