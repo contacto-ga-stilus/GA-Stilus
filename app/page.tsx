@@ -7,6 +7,16 @@ import Contacto from "./components/Contacto";
 
 export default function Home() {
   return (
+    <div>
+      <p>API Key: {process.env.NEXT_PUBLIC_FIREBASE_API_KEY}</p>
+      <p>Project ID: {process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}</p>
+    </div>
+  );
+}
+
+/*
+export default function Home() {
+  return (
     <>
       <Header />
 
@@ -19,3 +29,5 @@ export default function Home() {
     </>
   );
 }
+
+*/
