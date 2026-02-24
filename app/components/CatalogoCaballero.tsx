@@ -17,7 +17,6 @@ export default function CatalogoCaballero() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [selectedCategoria, setSelectedCategoria] = useState<Categoria | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -70,8 +69,9 @@ export default function CatalogoCaballero() {
     setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
   };
 
+  // TODO: card click currently navigates to catalog page; keep handler if we need
   const handleCategoryClick = (categoria: Categoria) => {
-  setSelectedCategoria(categoria);
+    router.push('/CatalogoCaballero');
   };
 
   useEffect(() => {
@@ -88,12 +88,27 @@ export default function CatalogoCaballero() {
     };
   }, [categorias]);
 
+  // while we are fetching categories show a skeleton carousel to avoid jarring empty state
   if (loading) {
-    return <section className="catalog-section"><p>Cargando...</p></section>;
-  }
-
-  if (selectedCategoria) {
-    return <></>; // página completamente en blanco
+    return (
+      <section id="caballero" className="catalog-section">
+        <div className="catalog-content">
+          <h2 className="catalog-title">Catálogo de Caballero</h2>
+          <div className="catalog-carousel" ref={carouselRef}>
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <div key={idx} className="catalog-card placeholder">
+                <div className="catalog-card-image">
+                  <div className="placeholder-img" />
+                </div>
+                <div className="catalog-card-content">
+                  <h3 className="catalog-card-title">&nbsp;</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -124,7 +139,16 @@ export default function CatalogoCaballero() {
                 onMouseLeave={() => setHoveredCard(null)}
                 onClick={() => router.push('/CatalogoCaballero')}
               >
-                <div className="catalog-card-image">
+                {/* use a background image based on category name */}
+                <div
+                  className="catalog-card-image"
+                  style={{
+                    backgroundImage: `url('/images/${category.nombre}Caballero.jpg')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  {/* fallback placeholder for when image fails to load */}
                   <div
                     className="placeholder-img"
                     style={{ width: '100%', height: '100%' }}

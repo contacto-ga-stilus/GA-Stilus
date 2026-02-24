@@ -368,6 +368,19 @@ body {
 }
 
 /* ==================== CATALOG LOADING/ERROR/EMPTY ==================== */
+.catalog-card.placeholder {
+  opacity: 0.5;
+}
+.catalog-card.placeholder .catalog-card-title {
+  background: #e0e0e0;
+  color: transparent;
+}
+.catalog-card.placeholder .placeholder-img {
+  width: 100%;
+  height: 100%;
+  background: #ddd;
+}
+
 .catalog-loading,
 .catalog-error,
 .catalog-empty {
