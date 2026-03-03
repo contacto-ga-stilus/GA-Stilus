@@ -249,6 +249,51 @@ body {
   font-weight: 600;
 }
 
+/* ============================= */
+/* SECCIÓN CATÁLOGO CABALLERO  */
+/* ============================= */
+.caballero-section {
+  width: 100%;
+  height: 100vh;
+  /* Imagen correcta desde /public */
+  background-image: url('/CatalogoCaballero.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  /* Centramos el botón */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* ============================= */
+/* BOTÓN PRINCIPAL CABALLERO   */
+/* ============================= */
+.caballero-button {
+  padding: 10px 40px;
+  font-size: 30px;
+  font-weight: 600;
+
+  background-color: #00000067;
+  background: none;
+  color: #fff;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+/* Hover */
+.caballero-button:hover {
+  background-color: #222;
+  transform: scale(1.05);
+}
+/* Click */
+.caballero-button:active {
+  transform: scale(1);
+}
+
 /* ==================== CATALOG CAROUSEL ==================== */
 
 /* Firefox y IE */
@@ -417,52 +462,112 @@ body {
     font-size: 1.5rem;
   }
 }
-
+/* ========================================================= */
 /* ==================== CONTACT SECTION ==================== */
+/* ========================================================= */
 .contact-section {
-  min-height: 100vh;
-  padding: 4rem 1.5rem;
-  background-color: var(--primary-light);
+  background-color: rgba(26, 58, 71, 0.95);
+  color: #ffffff;
+  padding: 5rem 2rem;
+}
+/* Contenedor principal en 3 columnas */
+.contact-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+}
+/* ===== BRAND ===== */
+.brand-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.brand-description {
+  opacity: 0.8;
+  line-height: 1.6;
+}
+/* ===== CONTACT INFO ===== */
+.contact-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.contact-info ul {
+  list-style: none;
+  padding: 0;
+}
+.contact-info li {
+  margin-bottom: 0.8rem;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+.contact-info li:hover {
+  opacity: 1;
+}
+/* ===== LOCATION ===== */
+.location-box {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+}
+.location-box span {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+/* ===== MAPA ===== */
+.map-container {
+  margin-top: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 900px) {
+  .contact-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+/* ========================================================= */
+/* ===================== Social Icons ====================== */
+/* ========================================================= */
+.social-icons {
+  display: flex;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+.social-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+.social-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.social-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
 }
 
-.contact-content {
-  max-width: 1200px;
-  width: 100%;
-}
-
-.contact-title {
-  font-size: clamp(1.75rem, 6vw, 2.75rem);
-  color: var(--primary-dark);
-  margin-bottom: 2rem;
-  text-align: center;
-  font-weight: 600;
-}
-
-.contact-placeholder {
-  min-height: 300px;
-  background-color: rgba(26, 58, 71, 0.05);
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  color: var(--primary-dark);
-  opacity: 0.7;
-}
-
-@media (max-width: 768px) {
-  .contact-section {
-    min-height: auto;
-    padding: 3rem 1.5rem;
-  }
-
-  .contact-title {
-    font-size: 1.5rem;
-  }
-}
-
-/* ==================== FOOTER ==================== */
+/* ========================================================= */
+/* ======================== FOOTER ========================= */
+/* ========================================================= */
 .footer {
   background-color: var(--primary-dark);
   color: var(--text-secondary);
