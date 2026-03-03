@@ -8,7 +8,7 @@ export default function Contacto() {
           <h2 className="brand-title">GA Stilus</h2>
           <p className="brand-description">
             Elegancia y estilo en cada detalle.
-            Descubre nuestras colecciones y vive la experiencia GA Stilus.
+            Descubre nuestras colecciones y dejate soprender por la experiencia GA Stilus.
           </p>
 
           {/* ====== Redes Sociales ====== */}
