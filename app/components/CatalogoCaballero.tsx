@@ -16,7 +16,7 @@ export default function CatalogoCaballero() {
         className="caballero-button"
         onClick={handleClick}
       >
-        Ir al catálogo de Caballero
+        Ir al Catálogo de Caballero
       </button>
     </section>
   );
