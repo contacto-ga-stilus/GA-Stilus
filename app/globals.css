@@ -37,8 +37,9 @@ body {
   font-family: 'Geist Sans', Arial, Helvetica, sans-serif;
   line-height: 1.6;
 }
-
-/* ==================== HEADER ==================== */
+/* ========================================================= */
+/* ======================== HEADER ========================= */
+/* ========================================================= */
 .header {
   position: sticky;
   top: 0;
@@ -47,7 +48,6 @@ body {
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -56,32 +56,27 @@ body {
   align-items: center;
   padding: 0.75rem 1.5rem;
 }
-
 .header-logo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
 }
-
 .header-logo svg {
   width: 45px;
   height: 45px;
 }
-
 .header-text {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
   display: none;
 }
-
 @media (min-width: 768px) {
   .header-text {
     display: block;
   }
 }
-
 .menu-toggle {
   display: flex;
   flex-direction: column;
@@ -91,7 +86,6 @@ body {
   cursor: pointer;
   padding: 0.5rem;
 }
-
 .menu-toggle span {
   width: 25px;
   height: 2px;
@@ -99,25 +93,20 @@ body {
   transition: all 0.3s ease;
   border-radius: 2px;
 }
-
 .menu-toggle.active span:nth-child(1) {
   transform: rotate(45deg) translate(10px, 10px);
 }
-
 .menu-toggle.active span:nth-child(2) {
   opacity: 0;
 }
-
 .menu-toggle.active span:nth-child(3) {
   transform: rotate(-45deg) translate(7px, -7px);
 }
-
 @media (min-width: 768px) {
   .menu-toggle {
     display: none;
   }
 }
-
 .header-nav {
   display: none;
   position: absolute;
@@ -129,18 +118,15 @@ body {
   flex-direction: column;
   gap: 0.5rem;
 }
-
 .header-nav.active {
   display: flex;
 }
-
 .header-nav ul {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-
 .header-nav button {
   background: none;
   border: none;
@@ -151,11 +137,9 @@ body {
   transition: color 0.3s ease;
   text-align: left;
 }
-
 .header-nav button:hover {
   color: var(--accent-green);
 }
-
 @media (min-width: 768px) {
   .header-nav {
     display: flex;
@@ -163,19 +147,18 @@ body {
     background: none;
     padding: 0;
   }
-
   .header-nav ul {
     flex-direction: row;
     gap: 2rem;
   }
-
   .header-nav button {
     padding: 0;
     font-size: 0.95rem;
   }
 }
-
-/* ==================== HERO SECTION ==================== */
+/* ========================================================= */
+/* ===================== HERO SECTION ====================== */
+/* ========================================================= */
 .hero-section {
   position: relative;
   width: 100%;
@@ -185,11 +168,10 @@ body {
   align-items: center;
   justify-content: center;
   background: 
-    url('/Portada.png') center / cover no-repeat;
+    url('/Portada.png') top / cover no-repeat;
   background-attachment: fixed;
   overflow: hidden;
 }
-
 .hero-content {
   position: relative;
   z-index: 2;
@@ -198,7 +180,6 @@ body {
   padding: 2rem;
   max-width: 800px;
 }
-
 .hero-title {
   font-size: clamp(5.5rem, 8vw, 4.5rem);
   font-weight: 700;
@@ -206,26 +187,22 @@ body {
   letter-spacing: -1px;
   color: rgba(23, 50, 61, 0.952);
 }
-
 .hero-description {
   font-size: clamp(2rem, 4vw, 1.5rem);
-  font-weight: 300;
+  font-weight: 350;
   opacity: 0.95;
   margin-bottom: 2rem;
   color:rgba(2, 23, 31, 0.959)
 }
-
 @media (max-width: 640px) {
   .hero-section {
     height: 70vh;
     min-height: 500px;
   }
-
   .hero-content {
     padding: 1.5rem;
   }
 }
-
 /* ==================== CATALOG SECTIONS ==================== */
 .catalog-section {
   min-height: 100vh;
@@ -249,9 +226,9 @@ body {
   font-weight: 600;
 }
 
-/* ============================= */
-/* SECCIÓN CATÁLOGO CABALLERO  */
-/* ============================= */
+/* ========================================================= */
+/* ============== CATÁLOGO CABALLERO / DAMA ================ */
+/* ========================================================= */
 .caballero-section {
   width: 100%;
   height: 100vh;
@@ -265,9 +242,19 @@ body {
   justify-content: center;
   align-items: center;
 }
-/* ============================= */
-/* BOTÓN PRINCIPAL CABALLERO   */
-/* ============================= */
+.dama-section {
+  width: 100%;
+  height: 100vh;
+  background-image: url('/CatalogoDama.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  /* Centramos el botón */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* ===== Botón PRINCIPAL CABALLERO ===== */
 .caballero-button {
   padding: 10px 40px;
   font-size: 30px;

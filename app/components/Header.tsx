@@ -60,7 +60,6 @@ export default function Header() {
               Stilus
             </text>
           </svg>
-          <span className="header-text">GA Stilus</span>
         </div>
 
         <button
