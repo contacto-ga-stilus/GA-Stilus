@@ -1,10 +1,10 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Carpeta pública de productos (solo escritura autenticada)
-    match /productos_caballero/{allPaths=**} {
+    // Carpeta de productos (lectura pública, escritura solo para admins)
+    match /productos/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
     }
     match /{allPaths=**} {
       allow read, write: if false;

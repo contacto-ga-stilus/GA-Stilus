@@ -6,9 +6,11 @@ import './admin.css';
 import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
-  const { isAuthenticated, isLoading, login, logout } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading, error: authError, username, login, logout } = useAuth();
+  const [inputUsername, setInputUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [localError, setLocalError] = useState('');
 
   const router = useRouter();
 
@@ -20,20 +22,23 @@ export default function AdminPage() {
     );
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setLocalError('');
 
-    if (!password) {
-      setError('Por favor ingresa la contraseña');
+    if (!inputUsername || !password) {
+      setLocalError('Por favor ingresa usuario y contraseña');
       return;
     }
 
-    if (login(password)) {
+    setIsLoggingIn(true);
+    const success = await login(inputUsername, password);
+    setIsLoggingIn(false);
+
+    if (!success) {
       setPassword('');
-      // La página se actualizará automáticamente porque isAuthenticated cambió
     } else {
-      setError('Contraseña incorrecta');
+      setInputUsername('');
       setPassword('');
     }
   };
@@ -50,28 +55,74 @@ export default function AdminPage() {
 
           <form onSubmit={handleLogin} className="login-form">
             <div className="form-group">
-              <label>Contraseña de administrador</label>
+              <label>Usuario</label>
               <input
-                type="password"
-                placeholder="Ingresa la contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type="text"
+                placeholder="Tu nombre de usuario"
+                value={inputUsername}
+                onChange={(e) => setInputUsername(e.target.value)}
                 className="input-field"
+                disabled={isLoggingIn}
+                autoComplete="username"
               />
             </div>
 
-            {error && <div className="error-message">{error}</div>}
+            <div className="form-group">
+              <label>Contraseña</label>
+              <input
+                type="password"
+                placeholder="Tu contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input-field"
+                disabled={isLoggingIn}
+                autoComplete="current-password"
+              />
+            </div>
 
-            <button type="submit" className="btn-login">
-              Entrar
+            {(localError || authError) && (
+              <div className="error-message">{localError || authError}</div>
+            )}
+
+            <button type="submit" className="btn-login" disabled={isLoggingIn}>
+              {isLoggingIn ? 'Iniciando sesión...' : 'Entrar'}
             </button>
           </form>
+
+          <div className="login-help">
+            <p style={{ fontSize: '12px', color: '#666', marginTop: '20px' }}>
+              ¿Necesitas crear una cuenta? Contacta al administrador
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Si ESTÁ autenticado, mostrar dashboard
+  // Si NO es admin, mostrar acceso denegado
+  if (!isAdmin) {
+    return (
+      <div className="admin-login-page">
+        <div className="login-card">
+          <div className="logo-container">
+            <img src="/LOGO.jpg" alt="GA Stilus Logo" className="login-logo" />
+          </div>
+          <p className="subtitle">Acceso Denegado</p>
+          
+          <div style={{ textAlign: 'center', padding: '20px', color: '#a33' }}>
+            <p style={{ marginBottom: '20px' }}>
+              La cuenta <strong>{username}</strong> no tiene permisos de administrador.
+            </p>
+            <button onClick={logout} className="btn-logout">
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si ESTÁ autenticado Y es admin, mostrar dashboard
   return (
     <div className="admin-dashboard">
       <header className="admin-header">
@@ -83,6 +134,9 @@ export default function AdminPage() {
           </div>
         </div>
         <div className="header-right">
+          <span style={{ marginRight: '20px', fontSize: '14px', color: '#666' }}>
+            👤 {username}
+          </span>
           <a href="/" className="btn-ver-sitio">← Ver sitio</a>
           <button onClick={logout} className="btn-logout">
             Cerrar Sesión

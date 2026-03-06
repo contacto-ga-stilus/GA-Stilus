@@ -5,13 +5,18 @@ service cloud.firestore {
     // Productos
     match /productos/{productoId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
     }
     
     // Categorías
     match /categorias/{categoriaId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Admin users (solo pueden leer su propio documento)
+    match /admin_users/{userId} {
+      allow read, write: if request.auth.uid == userId;
     }
     
     // Todo lo demás bloqueado
