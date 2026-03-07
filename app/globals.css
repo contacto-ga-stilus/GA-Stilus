@@ -590,6 +590,10 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   border-color: #4a90e2;
 }
+.product-gallery-card-link {
+  text-decoration: none;
+  color: inherit;
+}
 /* Imagen completa vertical */
 .gallery-card-image {
   position: relative;
@@ -625,16 +629,9 @@ body {
   font-weight: 700;
   color: #4a90e2;
 }
-/* ===== RESPONSIVE ===== */
-/* Móvil */
-@media (max-width: 768px) {
-  .products-gallery {
-    grid-template-columns: 1fr; 
-  }
-  .caballero-top-categorias {
-    gap: 15px;
-    font-size: 12px;
-  }
+.product-gallery-card-link {
+  text-decoration: none;
+  color: inherit;
 }
 /* ========================================================= */
 /* =================== Pop up Productos ==================== */

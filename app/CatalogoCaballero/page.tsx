@@ -36,6 +36,22 @@ export default function CatalogoCaballeroPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!loading && productos.length > 0 && typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const titulo = urlParams.get('titulo');
+      const marca = urlParams.get('marca');
+      const descripcion = urlParams.get('descripcion');
+      if (titulo && marca && descripcion) {
+        const producto = productos.find(p => p.titulo === titulo && p.marca === marca && p.descripcion === descripcion);
+        if (producto) {
+          setSelectedProducto(producto);
+          setCurrentImage(0);
+        }
+      }
+    }
+  }, [loading, productos]);
+
   const fetchData = async () => {
     try {
       const catSnap = await getDocs(collection(db, 'categorias'));
@@ -214,7 +230,7 @@ export default function CatalogoCaballeroPage() {
                 <a
                   className="whatsapp-button"
                   href={`https://wa.me/527221331072?text=${encodeURIComponent(
-                    `Hola, me interesa este producto: ${selectedProducto.titulo} - ${window.location.href}`
+                    `Hola, me interesa este producto: ${selectedProducto.titulo} - ${window.location.origin}/CatalogoCaballero?titulo=${encodeURIComponent(selectedProducto.titulo || '')}&marca=${encodeURIComponent(selectedProducto.marca || '')}&descripcion=${encodeURIComponent(selectedProducto.descripcion || '')}`
                   )}`}
                   target="_blank"
                 >

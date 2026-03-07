@@ -36,3 +36,7 @@ yarn-error.log*
 # Firebase service account key (NEVER commit this)
 serviceAccountKey.json
 
+# Archivos de documentación local
+CAMBIOS_IMPLEMENTADOS.md
+FIREBASE_SETUP.md
+SETUP_FIREBASE_STEPS.md
