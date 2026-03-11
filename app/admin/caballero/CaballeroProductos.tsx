@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+//Importamos funciones de Firebase para manejar la base de datos
 import {
   collection,
   getDocs,
@@ -9,16 +10,17 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+//Importamos funcuiones de Storage para manejar las imágenes
 import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
+//Configuración de Firebase
 import { db, storage } from "../../../lib/firebase";
 
-// firebase logic implemented below
-
+//Define la estructura de un producto
 interface Producto {
   id: string;
   activo?: boolean;
@@ -32,24 +34,26 @@ interface Producto {
   talla?: string[];
   titulo?: string;
 }
-
+//Define la estructura de una categoría
 interface Categoria {
   id: string;
   nombre: string;
 }
-
-
+//Componente principal para gestionar productos de Caballero en el panel de administración
 export default function CaballeroProductos() {
+  //Estados para manejar la lista de productos y categorías, así como el estado de carga
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(false);
-
+  //Estados para manejar el formulario de creación/edición de productos
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
-
+  //Estados para manejar el formulario de creación/edición de productos
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-
+  //Estados para manejar la selección de productos favoritos
+  const [showFavs, setShowFavs] = useState<string[]>([]);
+  //Datos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     descripcion: "",
@@ -58,17 +62,18 @@ export default function CaballeroProductos() {
     categoria: "",
     genero: "",
     marca: "",
-    talla: "", // comma-separated
+    talla: "", //separada por comas
     activo: true,
   });
+  //Estados para manejar la subida de imágenes
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
-
+  //Carga inicial de productos y categorías al montar el componente
   useEffect(() => {
     fetchCategorias();
     fetchProductos();
   }, []);
-
+  //Función para cargar categorías desde Firestore, filtrando solo las activas para caballero
   const fetchCategorias = async () => {
     try {
       const q = collection(db, "categorias");
@@ -76,7 +81,7 @@ export default function CaballeroProductos() {
       const cats: Categoria[] = snapshot.docs
         .filter((d) => {
           const data = d.data() as any;
-          // only include active categories that have caballero in genero
+          //Solo se incluyen categorías que estén activas y tengan "caballero" en su género
           return data.activa !== false &&
             Array.isArray(data.genero) &&
             data.genero.includes("caballero");
@@ -87,7 +92,7 @@ export default function CaballeroProductos() {
       console.error("Error al cargar categorías", err);
     }
   };
-
+  //Función para cargar productos desde Firestore
   const fetchProductos = async () => {
     try {
       const q = collection(db, "productos");
@@ -101,8 +106,7 @@ export default function CaballeroProductos() {
       console.error("Error al cargar productos", err);
     }
   };
-
-
+  //Función para manejar cambios en los inputs del formulario
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -114,11 +118,11 @@ export default function CaballeroProductos() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-
+  //Función para manejar la selección de imagen en el formulario
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) setImageFile(e.target.files[0]);
   };
-
+  //Función para resetear el formulario a su estado inicial
   const resetForm = () => {
     setFormData({
       nombre: "",
@@ -136,11 +140,10 @@ export default function CaballeroProductos() {
     setEditingId(null);
     setShowForm(false);
   };
-
+  //Función para manejar el envío del formulario, tanto para crear como para actualizar productos
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     // Validación: solo nombre, genero y categoría son requeridos
     if (!((formData as any).nombre?.trim())) {
       alert("El título del producto es requerido.");
@@ -157,8 +160,7 @@ export default function CaballeroProductos() {
       setLoading(false);
       return;
     }
-
-    // build payload matching schema
+    //Construcción del payload para Firestore, transformando los datos del formulario al formato esperado
     const payload: any = {
       activo: (formData as any).activo,
       categoria: (formData as any).categoria,
@@ -174,12 +176,12 @@ export default function CaballeroProductos() {
         .filter((t: string) => t !== ""),
       titulo: (formData as any).nombre,
     };
-
+    //Si se está editando un producto existente, se actualiza; si no, se crea uno nuevo
     try {
       if (editingId) {
-        // actualizar documento existente
+        //actualizar documento existente
         await updateDoc(doc(db, "productos", editingId), payload);
-
+        //Si se seleccionó una nueva imagen, se sube y se actualiza el documento con la nueva URL
         if (imageFile) {
           const url = await uploadImage(editingId, imageFile);
           const updatedImages = [...existingImageUrls, url];
@@ -189,7 +191,7 @@ export default function CaballeroProductos() {
           setExistingImageUrls(updatedImages);
         }
       } else {
-        // crear nuevo documento
+        //crear nuevo documento
         const docRef = await addDoc(collection(db, "productos"), payload);
         if (imageFile) {
           const url = await uploadImage(docRef.id, imageFile);
@@ -198,6 +200,7 @@ export default function CaballeroProductos() {
           });
         }
       }
+      //Después de guardar, se recargan los productos y se resetea el formulario
       await fetchProductos();
       resetForm();
     } catch (err) {
@@ -207,7 +210,7 @@ export default function CaballeroProductos() {
       setLoading(false);
     }
   };
-
+  //Función para subir una imagen a Firebase Storage y obtener su URL
   const uploadImage = async (productId: string, file: File) => {
     const path = `productos/${productId}/${file.name}`;
     const sref = storageRef(storage, path);
@@ -215,8 +218,7 @@ export default function CaballeroProductos() {
     const url = await getDownloadURL(sref);
     return url;
   };
-
-
+  //Función para eliminar un producto, incluyendo sus imágenes asociadas en Storage
   const handleDeleteProducto = async (id: string) => {
     if (!confirm("¿Estás seguro de que deseas eliminar este producto?")) return;
     try {
@@ -227,7 +229,7 @@ export default function CaballeroProductos() {
       alert("No se pudo eliminar el producto.");
     }
   };
-
+  //Función para manejar la edición de un producto, cargando sus datos en el formulario
   const handleEditProducto = (producto: Producto) => {
     setEditingId(producto.id);
     setFormData({
@@ -245,14 +247,14 @@ export default function CaballeroProductos() {
     setExistingImageUrls(producto.imagenes || []);
     setShowForm(true);
   };
-
+  //Filtrado de productos para mostrar en la lista, combinando filtro por categoría y búsqueda por nombre
   const displayedProductos = productos.filter((p) => {
     const matchesCategory = categoriaSeleccionada ? p.categoria === categoriaSeleccionada : true;
     const name = p.titulo || "";
     const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
+  //Renderizado del componente, incluyendo el header con filtros y el formulario modal para crear/editar productos
   return (
     <div className="admin-products">
       <div className="products-header">
@@ -283,10 +285,13 @@ export default function CaballeroProductos() {
             <button className="btn-nuevo" onClick={() => setShowForm((s) => !s)}>
               Nuevo Producto
             </button>
+            <button className="btn-favoritos" onClick={() => setShowForm((s) => !s)}>
+              Favoritos
+            </button>
           </div>
         </div>
       </div>
-
+      {/* Formulario modal para crear o editar productos */ }
       {showForm && (
         <div className="modal-overlay" onClick={resetForm}>
           <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
@@ -318,7 +323,7 @@ export default function CaballeroProductos() {
                   </div>
                 </div>
               </div>
-
+              {/* Columna derecha del formulario con campos de categoría, marca, género y talla */ }
               <div className="form-col">
                 <div className="form-row">
                   <label>Categoría <span className="required">*</span></label>
@@ -338,7 +343,6 @@ export default function CaballeroProductos() {
                   <select name="genero" value={(formData as any).genero} onChange={handleInputChange}>
                     <option value="">-- Seleccionar --</option>
                     <option value="caballero">Caballero</option>
-                    <option value="dama">Dama</option>
                   </select>
                 </div>
                 <div className="form-row">
@@ -346,7 +350,7 @@ export default function CaballeroProductos() {
                   <input name="talla" value={(formData as any).talla} onChange={handleInputChange} />
                 </div>
               </div>
-
+              {/* Sección para manejar la subida de imágenes, mostrando previews de las imágenes existentes y permitiendo eliminar o agregar nuevas imágenes */ }
               <div className="form-full">
                 <div className="form-row">
                   <label>Imágenes del Producto</label>
@@ -404,7 +408,7 @@ export default function CaballeroProductos() {
           </div>
         </div>
       )}
-
+      {/* Lista de productos, mostrando solo los que coinciden con el filtro de categoría y búsqueda por nombre */ }
       <section className="products-list">
         {displayedProductos.length === 0 ? (
           <div className="catalog-empty">No hay productos</div>
