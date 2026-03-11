@@ -13,6 +13,7 @@ interface Categoria {
 interface Producto {
   id: string;
   categoria?: string;
+  favoritoCaballero?: boolean;
   titulo?: string;
   imagenes?: string[];
   marca?: string;
@@ -22,6 +23,7 @@ interface Producto {
   ocultarPrecio?: boolean;
   genero?: string;
   activo?: boolean;
+  createdAt?: number | { _seconds: number; _nanoseconds: number };
 }
 
 export default function CatalogoCaballeroPage() {
@@ -84,9 +86,28 @@ export default function CatalogoCaballeroPage() {
     }
   };
 
-  const filteredProductos = selectedCategoria
+  // Ordenamos productos según la vista:
+  // 1) En categoría específica: favoritos anclados arriba y luego recientes
+  // 2) En TODO: solo recientes (sin anclado global de favoritos)
+  const filteredProductos = (selectedCategoria
     ? productos.filter((p) => p.categoria === selectedCategoria)
-    : productos;
+    : productos
+  ).sort((a, b) => {
+    // Solo aplicamos prioridad por favorito cuando hay categoría seleccionada
+    if (selectedCategoria) {
+      if (Boolean(a.favoritoCaballero) !== Boolean(b.favoritoCaballero)) {
+        return a.favoritoCaballero ? -1 : 1;
+      }
+    }
+
+    // El criterio base siempre es orden por fecha de creación más reciente
+    const getTimestamp = (product: Producto) => {
+      if (!product.createdAt) return 0;
+      if (typeof product.createdAt === 'number') return product.createdAt;
+      return product.createdAt._seconds || 0;
+    };
+    return getTimestamp(b) - getTimestamp(a);
+  });
 
   if (loading) return <p className="catalogo-loading">Cargando...</p>;
 

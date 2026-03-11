@@ -816,7 +816,6 @@
     width: 100%;
   }
 }
-
   .welcome-section h2 {
     font-size: 22px;
   }
@@ -824,3 +823,206 @@
   .dashboard-card h3 {
     font-size: 16px;
   }
+
+/* Modal específico para favoritos: aplicamos estilos adicionales al modal-content */
+.modal-content.modal-favs {
+  max-width: 600px;/* Ancho máximo reducido comparado con el modal de productos */
+}
+
+/* Grid de categorías del primer modal de favoritos */
+.favs-categories-grid {
+  display: grid;/* Usamos grid para acomodar botones de categoría */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));/* Columnas responsivas con ancho mínimo de 150px */
+  gap: 12px;/* Espacio entre botones */
+  margin-bottom: 24px;/* Separación inferior antes de los botones de acción */
+}
+
+/* Botón de categoría en el primer modal */
+.btn-category-fav {
+  background: linear-gradient(135deg, #2aec91 0%, #11ffa4 100%);/* Fondo base blanco para contraste */
+  color: #1a3a47;/* Texto oscuro corporativo */
+  border: 2px solid rgba(26, 58, 71, 0.1);/* Borde suave para delimitar botón */
+  padding: 16px 12px;/* Área de clic cómoda */
+  border-radius: 10px;/* Esquinas redondeadas */
+  cursor: pointer;/* Indicador visual de botón clicable */
+  font-weight: 600;/* Peso de texto destacado */
+  transition: all 0.3s ease;/* Transición para hover y active */
+  font-size: 14px;/* Tamaño legible */
+  min-height: 50px;/* Altura mínima uniforme */
+  display: flex;/* Usamos flex para centrar texto */
+  align-items: center;/* Centrado vertical */
+  justify-content: center;/* Centrado horizontal */
+}
+
+/* Hover del botón de categoría */
+.btn-category-fav:hover {
+  border-color: #4a90e2;/* Resaltamos borde en azul */
+  background: rgba(74, 144, 226, 0.05);/* Fondo azul tenue */
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);/* Sombra ligera */
+  transform: translateY(-2px);/* Efecto de elevación */
+}
+
+/* Estado activo del botón de categoría */
+.btn-category-fav.active {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);/* Gradiente azul para categoría seleccionada */
+  color: #ffffff;/* Texto blanco para contraste */
+  border-color: #4a90e2;/* Borde alineado al color activo */
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);/* Sombra más marcada */
+}
+
+/* Contenedor de acciones compartido entre ambos modales de favoritos */
+.favs-actions {
+  display: flex;/* Distribuimos botones en fila */
+  gap: 12px;/* Espacio entre botones */
+  justify-content: center;/* Centrado horizontal */
+  margin-top: 20px;/* Separación superior */
+  padding-top: 20px;/* Espacio interno superior */
+  border-top: 1px solid rgba(26, 58, 71, 0.08);/* Línea divisoria sutil */
+}
+
+/* Botón principal para confirmar acción en favoritos */
+.btn-fav-confirm {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);/* Gradiente azul de acción principal */
+  color: #ffffff;/* Texto blanco */
+  border: none;/* Sin borde extra */
+  padding: 12px 24px;/* Área cómoda de clic */
+  border-radius: 8px;/* Bordes redondeados */
+  cursor: pointer;/* Cursor de interacción */
+  font-weight: 600;/* Peso medio-alto */
+  transition: all 0.3s ease;/* Transición de interacción */
+  text-transform: uppercase;/* Texto en mayúsculas */
+  letter-spacing: 0.5px;/* Espaciado para legibilidad */
+  font-size: 14px;/* Tamaño uniforme */
+}
+
+/* Hover para botón principal de favoritos */
+.btn-fav-confirm:hover:not(:disabled) {
+  transform: translateY(-2px);/* Elevación al pasar el cursor */
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);/* Sombra de profundidad */
+}
+
+/* Estado deshabilitado del botón principal */
+.btn-fav-confirm:disabled {
+  opacity: 0.5;/* Reducimos presencia visual */
+  cursor: not-allowed;/* Indicamos bloqueo */
+}
+
+/* Botón secundario para cerrar/cancelar en favoritos */
+.btn-fav-cancel {
+  background: rgba(231, 76, 60, 0.9);/* Fondo rojo para acción de salida */
+  color: #ffffff;/* Texto blanco */
+  border: none;/* Sin borde adicional */
+  padding: 12px 24px;/* Área de clic cómoda */
+  border-radius: 8px;/* Esquinas redondeadas */
+  cursor: pointer;/* Cursor de interacción */
+  font-weight: 600;/* Peso visual consistente */
+  transition: all 0.3s ease;/* Transición de estado */
+  text-transform: uppercase;/* Texto en mayúsculas */
+  letter-spacing: 0.5px;/* Espaciado de letras */
+  font-size: 14px;/* Tamaño uniforme */
+}
+
+/* Hover del botón secundario */
+.btn-fav-cancel:hover {
+  transform: translateY(-2px);/* Elevación visual */
+  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);/* Sombra roja suave */
+}
+
+/* Lista de cards alargadas del segundo modal de favoritos */
+.fav-products-list {
+  display: flex;/* Usamos flex para apilar cards */
+  flex-direction: column;/* Cards una debajo de otra */
+  gap: 12px;/* Espacio vertical entre cards */
+  max-height: 50vh;/* Altura máxima para no desbordar pantalla */
+  overflow-y: auto;/* Scroll vertical cuando hay muchos productos */
+  padding-right: 4px;/* Espacio para evitar corte visual con scroll */
+}
+
+/* Card alargada del segundo modal de favoritos */
+.fav-product-card {
+  display: flex;/* Distribuimos información y estrella en los extremos */
+  align-items: center;/* Centramos contenido verticalmente */
+  justify-content: space-between;/* Texto a la izquierda y estrella a la derecha */
+  gap: 12px;/* Separación interna */
+  background: #f1f3f5;/* Fondo gris claro para distinguir la card */
+  border: 1px solid #d9dee3;/* Borde sutil */
+  border-radius: 12px;/* Esquinas redondeadas */
+  padding: 14px 16px;/* Espaciado interno */
+}
+
+/* Bloque de información textual dentro de la card alargada */
+.fav-product-info {
+  display: flex;/* Agrupamos título y marca */
+  flex-direction: column;/* Título arriba y marca abajo */
+  gap: 4px;/* Separación pequeña */
+  min-width: 0;/* Permitimos truncamiento correcto */
+}
+
+/* Título del producto en la card alargada */
+.fav-product-title {
+  margin: 0;/* Quitamos margen por defecto */
+  color: #1a3a47;/* Color principal */
+  font-size: 15px;/* Tamaño destacado */
+  font-weight: 700;/* Peso fuerte */
+  white-space: nowrap;/* Evitamos saltos de línea */
+  overflow: hidden;/* Ocultamos excedente */
+  text-overflow: ellipsis;/* Mostramos puntos suspensivos */
+}
+
+/* Marca del producto en la card alargada */
+.fav-product-brand {
+  margin: 0;/* Quitamos margen por defecto */
+  color: #5f6b74;/* Tono gris para texto secundario */
+  font-size: 13px;/* Tamaño menor que el título */
+  text-transform: uppercase;/* Estilo visual consistente */
+  letter-spacing: 0.4px;/* Mejor legibilidad */
+}
+
+/* Botón de estrella al final de la card */
+.fav-star-btn {
+  background: #d3d8dd;/* Fondo gris para que se distinga sobre la card */
+  color: #7a838b;/* Estrella en gris por defecto */
+  border: 1px solid #bcc5cd;/* Borde sutil */
+  border-radius: 10px;/* Esquinas redondeadas */
+  width: 42px;/* Ancho fijo del botón */
+  height: 42px;/* Alto fijo del botón */
+  display: inline-flex;/* Centrado del icono */
+  align-items: center;/* Centrado vertical */
+  justify-content: center;/* Centrado horizontal */
+  cursor: pointer;/* Cursor de interacción */
+  transition: all 0.25s ease;/* Transición para hover y active */
+  flex-shrink: 0;/* Evitamos que el botón se encoja */
+}
+
+/* Hover para el botón de estrella */
+.fav-star-btn:hover {
+  transform: translateY(-1px);/* Elevación ligera */
+  box-shadow: 0 3px 8px rgba(26, 58, 71, 0.2);/* Sombra discreta */
+}
+
+/* Estado activo de la estrella cuando se marca favorito */
+.fav-star-btn.active {
+  background: #e3efff;/* Fondo azul claro para estado activo */
+  color: #1d6fe3;/* Estrella azul */
+  border-color: #7aaef5;/* Borde azul */
+}
+
+/* Ajustes responsive para ambos modales de favoritos */
+@media (max-width: 768px) {
+  .favs-categories-grid {
+    grid-template-columns: 1fr;/* En móvil dejamos una columna de categorías */
+  }
+
+  .favs-actions {
+    flex-direction: column;/* En móvil apilamos botones de acción */
+  }
+
+  .btn-fav-confirm,
+  .btn-fav-cancel {
+    width: 100%;/* Botones de acción al ancho completo */
+  }
+
+  .fav-product-card {
+    padding: 12px;/* Reducimos padding para pantallas pequeñas */
+  }
+}

@@ -15,7 +15,6 @@ import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
-  deleteObject,
 } from "firebase/storage";
 //Configuración de Firebase
 import { db, storage } from "../../../lib/firebase";
@@ -25,7 +24,9 @@ interface Producto {
   id: string;
   activo?: boolean;
   categoria?: string;
+  createdAt?: number | { _seconds: number; _nanoseconds: number };
   descripcion?: string;
+  favoritoCaballero?: boolean;
   genero?: string;
   imagenes?: string[];
   marca?: string;
@@ -51,8 +52,12 @@ export default function CaballeroProductos() {
   //Estados para manejar el formulario de creación/edición de productos
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  //Estados para manejar la selección de productos favoritos
-  const [showFavs, setShowFavs] = useState<string[]>([]);
+  //Estados para manejar la ventana modal de favoritos
+  const [showFavs, setShowFavs] = useState(false);
+  // Estado para almacenar la categoría seleccionada en el modal de favoritos
+  const [favsCategorySelected, setFavsCategorySelected] = useState<string | null>(null);
+  // Estado para controlar la apertura del segundo modal de productos favoritos por categoría
+  const [showFavsProductsModal, setShowFavsProductsModal] = useState(false);
   //Datos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
@@ -192,7 +197,13 @@ export default function CaballeroProductos() {
         }
       } else {
         //crear nuevo documento
-        const docRef = await addDoc(collection(db, "productos"), payload);
+        const docRef = await addDoc(collection(db, "productos"), {
+          ...payload,
+          // En productos nuevos el favorito inicia en falso para caballero
+          favoritoCaballero: false,
+          // Timestamp de creación para soportar orden por recientes en catálogo
+          createdAt: Date.now(),
+        });
         if (imageFile) {
           const url = await uploadImage(docRef.id, imageFile);
           await updateDoc(doc(db, "productos", docRef.id), {
@@ -254,6 +265,61 @@ export default function CaballeroProductos() {
     const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+  // Filtrado de productos por la categoría seleccionada dentro del flujo de favoritos
+  const favsCategoryProducts = productos.filter(
+    (p) => (favsCategorySelected ? p.categoria === favsCategorySelected : false)
+  );
+  // Función para abrir productos de la categoría seleccionada dentro del flujo de favoritos
+  const handleSelectFavsCategory = (categoryId: string) => {
+    setFavsCategorySelected(categoryId);
+    setShowFavs(false);
+    setShowFavsProductsModal(true);
+  };
+  // Función para volver del modal de productos al modal de categorías
+  const handleBackToFavsCategories = () => {
+    setShowFavsProductsModal(false);
+    setShowFavs(true);
+  };
+  // Función para confirmar la selección de favoritos de la categoría elegida
+  const handleConfirmFavsCategory = () => {
+    if (!favsCategorySelected) return;
+    const selectedCategoryName =
+      categorias.find((c) => c.id === favsCategorySelected)?.nombre || "la categoría seleccionada";
+
+    setShowFavs(false);
+    alert(`Favoritos de ${selectedCategoryName} confirmados correctamente.`);
+  };
+  // Función para cerrar el segundo modal de productos favoritos y limpiar la categoría seleccionada
+  const handleCloseFavsProductsModal = () => {
+    setShowFavsProductsModal(false);
+    setFavsCategorySelected(null);
+  };
+  // Función para alternar el favorito de caballero y guardarlo en Firestore
+  const handleToggleFavoriteProduct = async (productId: string) => {
+    const productoActual = productos.find((p) => p.id === productId);
+    if (!productoActual) return;
+
+    const nextFavoriteValue = !Boolean(productoActual.favoritoCaballero);
+
+    try {
+      // Actualizamos en base de datos para que el favorito se refleje en el catálogo de usuarios
+      await updateDoc(doc(db, "productos", productId), {
+        favoritoCaballero: nextFavoriteValue,
+      });
+
+      // Actualizamos el estado local para reflejar el cambio de inmediato en la UI del admin
+      setProductos((prev) =>
+        prev.map((p) =>
+          p.id === productId
+            ? { ...p, favoritoCaballero: nextFavoriteValue }
+            : p
+        )
+      );
+    } catch (err) {
+      console.error("Error actualizando favorito de caballero", err);
+      alert("No se pudo actualizar el favorito. Intenta nuevamente.");
+    }
+  };
   //Renderizado del componente, incluyendo el header con filtros y el formulario modal para crear/editar productos
   return (
     <div className="admin-products">
@@ -285,12 +351,115 @@ export default function CaballeroProductos() {
             <button className="btn-nuevo" onClick={() => setShowForm((s) => !s)}>
               Nuevo Producto
             </button>
-            <button className="btn-favoritos" onClick={() => setShowForm((s) => !s)}>
+            <button className="btn-favoritos" onClick={() => setShowFavs((s) => !s)}>
               Favoritos
             </button>
           </div>
         </div>
       </div>
+      {/* MODAL DE FAVORITOS: Muestra una ventana con los botones de categorías de caballero */}
+      {showFavs && (
+        <div className="modal-overlay" onClick={() => setShowFavs(false)}>
+          <div className="modal-content modal-favs" onClick={(e) => e.stopPropagation()}>
+            {/* Título del modal de favoritos */}
+            <h3>Seleccionar Categoría de Favoritos</h3>
+            
+            {/* Contenedor con los botones de categorías */}
+            <div className="favs-categories-grid">
+              {/* Se mapean todas las categorías de caballero y se crean botones para cada una */}
+              {categorias.map((categoria) => (
+                <button
+                  type="button"
+                  key={categoria.id}
+                  className={`btn-category-fav ${favsCategorySelected === categoria.id ? 'active' : ''}`}
+                  onClick={() => handleSelectFavsCategory(categoria.id)}
+                >
+                  {/* Nombre de la categoría */}
+                  {categoria.nombre}
+                </button>
+              ))}
+            </div>
+
+            {/* Botones de acción: Aceptar y Cancelar */}
+            <div className="favs-actions">
+              {/* Botón para aceptar la selección final de favoritos y mostrar confirmación */}
+              <button 
+                type="button"
+                className="btn-fav-confirm" 
+                onClick={handleConfirmFavsCategory}
+                disabled={!favsCategorySelected}
+              >
+                Aceptar
+              </button>
+              {/* Botón para cancelar y cerrar el modal */}
+              <button 
+                type="button"
+                className="btn-fav-cancel" 
+                onClick={() => {
+                  setShowFavs(false);
+                  setFavsCategorySelected(null);
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SEGUNDO MODAL DE FAVORITOS: Muestra los productos de la categoría elegida en cards alargadas */}
+      {showFavsProductsModal && (
+        <div className="modal-overlay" onClick={handleCloseFavsProductsModal}>
+          <div className="modal-content modal-favs" onClick={(e) => e.stopPropagation()}>
+            {/* Título del modal que muestra la categoría seleccionada por nombre */}
+            <h3>
+              Productos de {categorias.find((c) => c.id === favsCategorySelected)?.nombre || "Categoría"}
+            </h3>
+
+            {/* Lista de productos con formato de card alargada y botón de estrella al final */}
+            <div className="fav-products-list">
+              {favsCategoryProducts.length === 0 ? (
+                <div className="catalog-empty">No hay productos en esta categoría</div>
+              ) : (
+                favsCategoryProducts.map((producto) => {
+                  // Determinamos si el producto ya está marcado como favorito desde Firestore
+                  const isActiveStar = Boolean(producto.favoritoCaballero);
+
+                  return (
+                    <article key={producto.id} className="fav-product-card">
+                      {/* Contenido textual de la card: solo título y marca */}
+                      <div className="fav-product-info">
+                        <h4 className="fav-product-title">{producto.titulo || "Sin título"}</h4>
+                        <p className="fav-product-brand">{producto.marca || "Sin marca"}</p>
+                      </div>
+
+                      {/* Botón de estrella: gris por defecto y azul cuando está activa */}
+                      <button
+                        type="button"
+                        className={`fav-star-btn ${isActiveStar ? "active" : ""}`}
+                        aria-label={`Marcar ${producto.titulo || "producto"} como favorito`}
+                        onClick={() => handleToggleFavoriteProduct(producto.id)}
+                      >
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+                          <path d="M12 2l2.98 6.04L21.6 9l-4.8 4.68 1.14 6.63L12 17.27l-5.94 3.04 1.14-6.63L2.4 9l6.62-.96L12 2z" />
+                        </svg>
+                      </button>
+                    </article>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Acciones del segundo modal: volver al modal de categorías */}
+            <div className="favs-actions">
+              <button type="button" className="btn-fav-cancel" onClick={handleBackToFavsCategories}>
+                Volver
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Formulario modal para crear o editar productos */ }
       {showForm && (
         <div className="modal-overlay" onClick={resetForm}>
