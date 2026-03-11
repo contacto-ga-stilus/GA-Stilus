@@ -510,9 +510,20 @@ body {
 /* ================== Catálogo Caballero =================== */
 /* ========================================================= */
 /* Fondo fijo */
-.catalogos-page {
+.caballero-page {
   min-height: 100vh;
   background-image: url('/Caballero.png');
+  background-size: cover;
+  background-position: top center;
+  background-attachment: fixed; /* 🔥 Hace que el fondo NO se mueva */
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+}
+/* Capa oscura encima del fondo */
+.dama-page {
+  min-height: 100vh;
+  background-image: url('/Dama.png');
   background-size: cover;
   background-position: top center;
   background-attachment: fixed; /* 🔥 Hace que el fondo NO se mueva */
@@ -659,9 +670,29 @@ body {
   animation: fadeIn 0.3s ease;
   align-items: center;
 }
+.product-modald {
+  background: #d6f1cade;
+  width: 100%;
+  max-width: 930px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 10px;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+  align-items: center;
+}
+/* RESPONSIVE: En pantallas pequeñas, mostramos dos columnas */
+.products-gallery {
+  display: grid;
+  gap: 25px;
+  margin: 0.5rem 0;
+  grid-template-columns: repeat(3, 1fr);
+}
 @media (max-width: 768px) {
-  .product-modal {
-    grid-template-columns: 1fr;
+  .products-gallery {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 .modal-close {
@@ -701,12 +732,23 @@ body {
   font-size: 23px;
   margin-bottom: 15px;
   color:rgba(14, 45, 63, 0.877);
+  margin-left: 20px;
+}
+.modal-infod {
+  font-size: 23px;
+  margin-bottom: 15px;
+  color:rgba(6, 37, 54, 0.877);
+  margin-left: 15px;
 }
 .modal-info h2 {
   margin-bottom: 5px;
 }
 .modal-brand {
   color: #147094;
+  margin-bottom: 15px;
+}
+.modal-brandd {
+  color: #991f39;
   margin-bottom: 15px;
 }
 .modal-description {
@@ -720,6 +762,7 @@ body {
   font-size: 20px;
   font-weight: bold;
   margin: 20px 0;
+  color: #267bfa;
 }
 /* 🔹 WHATSAPP BUTTON */
 .whatsapp-button {

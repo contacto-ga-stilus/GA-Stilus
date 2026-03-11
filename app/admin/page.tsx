@@ -186,7 +186,7 @@ export default function AdminPage() {
             <p>Administra los productos y categorías de damas</p>
             <button
               className="btn-action"
-              /*onClick={() => router.push('/admin/dama')}*/
+              onClick={() => router.push('/admin/dama')}
             >
               Ir al catálogo
             </button>

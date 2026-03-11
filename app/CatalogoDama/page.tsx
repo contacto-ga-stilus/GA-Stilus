@@ -4,16 +4,16 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-
+//Definición de tipos para categorías
 interface Categoria {
   id: string;
   nombre: string;
 }
-
+//Definición de tipos para productos
 interface Producto {
   id: string;
   categoria?: string;
-  favoritoCaballero?: boolean;
+  favoritoDama?: boolean;
   titulo?: string;
   imagenes?: string[];
   marca?: string;
@@ -25,19 +25,19 @@ interface Producto {
   activo?: boolean;
   createdAt?: number | { _seconds: number; _nanoseconds: number };
 }
-
-export default function CatalogoCaballeroPage() {
+// Componente principal de la página del catálogo de dama
+export default function CatalogoDamaPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [selectedProducto, setSelectedProducto] = useState<Producto | null>(null);
   const [currentImage, setCurrentImage] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  // Carga inicial de datos desde Firestore
   useEffect(() => {
     fetchData();
   }, []);
-
+  //Efecto para manejar selección de producto desde parámetros URL (compartir producto específico)
   useEffect(() => {
     if (!loading && productos.length > 0 && typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
@@ -53,19 +53,19 @@ export default function CatalogoCaballeroPage() {
       }
     }
   }, [loading, productos]);
-
+  // Función para cargar categorías y productos desde Firestore
   const fetchData = async () => {
     try {
       const catSnap = await getDocs(collection(db, 'categorias'));
       const prodSnap = await getDocs(collection(db, 'productos'));
-
+      // Filtramos categorías activas para dama y productos activos para dama
       const cats = catSnap.docs
         .filter((d) => {
           const data = d.data() as any;
           return (
             data.activa !== false &&
             Array.isArray(data.genero) &&
-            data.genero.includes('caballero')
+            data.genero.includes('dama')
           );
         })
         .map((d) => ({
@@ -75,7 +75,7 @@ export default function CatalogoCaballeroPage() {
       const prods = prodSnap.docs
         .map((d) => ({ id: d.id, ...(d.data() as any) }))
         .filter(
-          (p) => p.activo !== false && p.genero === 'caballero'
+          (p) => p.activo !== false && p.genero === 'dama'
         );
       setCategorias(cats);
       setProductos(prods);
@@ -85,7 +85,6 @@ export default function CatalogoCaballeroPage() {
       setLoading(false);
     }
   };
-
   // Ordenamos productos según la vista:
   // 1) En categoría específica: favoritos anclados arriba y luego recientes
   // 2) En TODO: solo recientes (sin anclado global de favoritos)
@@ -95,11 +94,10 @@ export default function CatalogoCaballeroPage() {
   ).sort((a, b) => {
     // Solo aplicamos prioridad por favorito cuando hay categoría seleccionada
     if (selectedCategoria) {
-      if (Boolean(a.favoritoCaballero) !== Boolean(b.favoritoCaballero)) {
-        return a.favoritoCaballero ? -1 : 1;
+      if (Boolean(a.favoritoDama) !== Boolean(b.favoritoDama)) {
+        return a.favoritoDama ? -1 : 1;
       }
     }
-
     // El criterio base siempre es orden por fecha de creación más reciente
     const getTimestamp = (product: Producto) => {
       if (!product.createdAt) return 0;
@@ -108,11 +106,11 @@ export default function CatalogoCaballeroPage() {
     };
     return getTimestamp(b) - getTimestamp(a);
   });
-
+  // Si aún estamos cargando datos, mostramos mensaje de carga
   if (loading) return <p className="catalogo-loading">Cargando...</p>;
-
+  // Renderizamos la página con categorías, galería de productos y modal de detalle
   return (
-    <section className="caballero-page">
+    <section className="dama-page">
       <div className="catalogos-overlay">
 
         {/* 🔹 Categorías superiores */}
@@ -225,10 +223,10 @@ export default function CatalogoCaballeroPage() {
                 )}
               </div>
               {/* 🔹 Información */}
-              <div className="modal-info">
+              <div className="modal-infod">
                 <h2>{selectedProducto.titulo}</h2>
 
-                <p className="modal-brand">
+                <p className="modal-brandd">
                   {selectedProducto.marca}
                 </p>
 
@@ -251,7 +249,7 @@ export default function CatalogoCaballeroPage() {
                 <a
                   className="whatsapp-button"
                   href={`https://wa.me/527221331072?text=${encodeURIComponent(
-                    `Hola, me interesa este producto: ${selectedProducto.titulo} - ${window.location.origin}/CatalogoCaballero?titulo=${encodeURIComponent(selectedProducto.titulo || '')}&marca=${encodeURIComponent(selectedProducto.marca || '')}&descripcion=${encodeURIComponent(selectedProducto.descripcion || '')}`
+                    `Hola, me interesa este producto: ${selectedProducto.titulo} - ${window.location.origin}/CatalogoDama?titulo=${encodeURIComponent(selectedProducto.titulo || '')}&marca=${encodeURIComponent(selectedProducto.marca || '')}&descripcion=${encodeURIComponent(selectedProducto.descripcion || '')}`
                   )}`}
                   target="_blank"
                 >

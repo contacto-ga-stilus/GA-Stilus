@@ -26,7 +26,7 @@ interface Producto {
   categoria?: string;
   createdAt?: number | { _seconds: number; _nanoseconds: number };
   descripcion?: string;
-  favoritoCaballero?: boolean;
+  favoritoDama?: boolean;
   genero?: string;
   imagenes?: string[];
   marca?: string;
@@ -40,8 +40,8 @@ interface Categoria {
   id: string;
   nombre: string;
 }
-//Componente principal para gestionar productos de Caballero en el panel de administración
-export default function CaballeroProductos() {
+//Componente principal para gestionar productos de Dama en el panel de administración
+export default function DamaProductos() {
   //Estados para manejar la lista de productos y categorías, así como el estado de carga
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -78,7 +78,7 @@ export default function CaballeroProductos() {
     fetchCategorias();
     fetchProductos();
   }, []);
-  //Función para cargar categorías desde Firestore, filtrando solo las activas para caballero
+  //Función para cargar categorías desde Firestore, filtrando solo las activas para dama
   const fetchCategorias = async () => {
     try {
       const q = collection(db, "categorias");
@@ -86,10 +86,10 @@ export default function CaballeroProductos() {
       const cats: Categoria[] = snapshot.docs
         .filter((d) => {
           const data = d.data() as any;
-          //Solo se incluyen categorías que estén activas y tengan "caballero" en su género
+          //Solo se incluyen categorías que estén activas y tengan "dama" en su género
           return data.activa !== false &&
             Array.isArray(data.genero) &&
-            data.genero.includes("caballero");
+            data.genero.includes("dama");
         })
         .map((d) => ({ id: d.id, nombre: d.data().nombre || "" }));
       setCategorias(cats);
@@ -106,8 +106,8 @@ export default function CaballeroProductos() {
         id: d.id,
         ...((d.data() as any) || {}),
       }))
-      //Solo mostramos productos del género caballero en este panel
-      .filter((p) => (p.genero || "").toLowerCase() === "caballero");
+      //Solo mostramos productos del género dama en este panel
+      .filter((p) => (p.genero || "").toLowerCase() === "dama");
       setProductos(prods as Producto[]);
     } catch (err) {
       console.error("Error al cargar productos", err);
@@ -201,8 +201,8 @@ export default function CaballeroProductos() {
         //crear nuevo documento
         const docRef = await addDoc(collection(db, "productos"), {
           ...payload,
-          // En productos nuevos el favorito inicia en falso para caballero
-          favoritoCaballero: false,
+          // En productos nuevos el favorito inicia en falso para dama
+          favoritoDama: false,
           // Timestamp de creación para soportar orden por recientes en catálogo
           createdAt: Date.now(),
         });
@@ -296,29 +296,29 @@ export default function CaballeroProductos() {
     setShowFavsProductsModal(false);
     setFavsCategorySelected(null);
   };
-  // Función para alternar el favorito de caballero y guardarlo en Firestore
+  // Función para alternar el favorito de dama y guardarlo en Firestore
   const handleToggleFavoriteProduct = async (productId: string) => {
     const productoActual = productos.find((p) => p.id === productId);
     if (!productoActual) return;
 
-    const nextFavoriteValue = !Boolean(productoActual.favoritoCaballero);
+    const nextFavoriteValue = !Boolean(productoActual.favoritoDama);
 
     try {
       // Actualizamos en base de datos para que el favorito se refleje en el catálogo de usuarios
       await updateDoc(doc(db, "productos", productId), {
-        favoritoCaballero: nextFavoriteValue,
+        favoritoDama: nextFavoriteValue,
       });
 
       // Actualizamos el estado local para reflejar el cambio de inmediato en la UI del admin
       setProductos((prev) =>
         prev.map((p) =>
           p.id === productId
-            ? { ...p, favoritoCaballero: nextFavoriteValue }
+            ? { ...p, favoritoDama: nextFavoriteValue }
             : p
         )
       );
     } catch (err) {
-      console.error("Error actualizando favorito de caballero", err);
+      console.error("Error actualizando favorito de dama", err);
       alert("No se pudo actualizar el favorito. Intenta nuevamente.");
     }
   };
@@ -350,7 +350,7 @@ export default function CaballeroProductos() {
                 </option>
               ))}
             </select>
-            <button className="btn-nuevo" onClick={() => setShowForm((s) => !s)}>
+            <button className="btn-dama" onClick={() => setShowForm((s) => !s)}>
               Nuevo Producto
             </button>
             <button className="btn-favoritos" onClick={() => setShowFavs((s) => !s)}>
@@ -359,7 +359,7 @@ export default function CaballeroProductos() {
           </div>
         </div>
       </div>
-      {/* MODAL DE FAVORITOS: Muestra una ventana con los botones de categorías de caballero */}
+      {/* MODAL DE FAVORITOS: Muestra una ventana con los botones de categorías de dama */}
       {showFavs && (
         <div className="modal-overlay" onClick={() => setShowFavs(false)}>
           <div className="modal-content modal-favs" onClick={(e) => e.stopPropagation()}>
@@ -368,7 +368,7 @@ export default function CaballeroProductos() {
             
             {/* Contenedor con los botones de categorías */}
             <div className="favs-categories-grid">
-              {/* Se mapean todas las categorías de caballero y se crean botones para cada una */}
+              {/* Se mapean todas las categorías de dama y se crean botones para cada una */}
               {categorias.map((categoria) => (
                 <button
                   type="button"
@@ -425,7 +425,7 @@ export default function CaballeroProductos() {
               ) : (
                 favsCategoryProducts.map((producto) => {
                   // Determinamos si el producto ya está marcado como favorito desde Firestore
-                  const isActiveStar = Boolean(producto.favoritoCaballero);
+                  const isActiveStar = Boolean(producto.favoritoDama);
 
                   return (
                     <article key={producto.id} className="fav-product-card">
@@ -513,7 +513,7 @@ export default function CaballeroProductos() {
                   <label>Género <span className="required">*</span></label>
                   <select name="genero" value={(formData as any).genero} onChange={handleInputChange}>
                     <option value="">-- Seleccionar --</option>
-                    <option value="caballero">Caballero</option>
+                    <option value="dama">Dama</option>
                   </select>
                 </div>
                 <div className="form-row">

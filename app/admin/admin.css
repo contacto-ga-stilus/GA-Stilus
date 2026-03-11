@@ -333,6 +333,16 @@
   font-weight: 700;
   cursor: pointer;
 }
+/* Botón para crear nuevo producto de dama, con fondo degradado, sin borde y estilos para el texto */
+.btn-dama {
+  background: linear-gradient(135deg, #e24ac1 0%, #bd35a6 100%);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
 /* Botón favoritos */
 .btn-favoritos {
   background: linear-gradient(135deg, #e2a04a 0%, #ec710d 100%);
