@@ -690,9 +690,16 @@ body {
   margin: 0.5rem 0;
   grid-template-columns: repeat(3, 1fr);
 }
+.product-modal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 @media (max-width: 768px) {
   .products-gallery {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .product-modal {
+    grid-template-columns: 1fr;
   }
 }
 .modal-close {
@@ -754,6 +761,7 @@ body {
 .modal-description {
   margin-bottom: 15px;
   line-height: 1.6;
+  margin-right: 15px;
 }
 .modal-size {
   margin-bottom: 15px;
