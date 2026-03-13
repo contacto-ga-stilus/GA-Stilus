@@ -2,16 +2,19 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ga-stilus.com'),
   title: 'GA Stilus',
   description: 'Moda con calidad y prestigio',
   applicationName: 'GA Stilus',
   manifest: '/manifest.webmanifest',
   themeColor: '#0b1f4b',
   icons: {
-    icon: [{ url: '/icon.jpg', type: 'image/jpeg' }],
-    shortcut: ['/icon.jpg'],
-    apple: [{ url: '/apple-icon.jpg', type: 'image/jpeg' }],
+    icon: [
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: ['/favicon-32x32.png'],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   appleWebApp: {
     capable: true,
