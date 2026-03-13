@@ -25,6 +25,7 @@
     "eslint": "^4.0.0",
     "eslint-config-next": "^0.2.4",
     "firebase-admin": "^10.3.0",
+    "png-to-ico": "^3.0.1",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "typescript": "^5"
